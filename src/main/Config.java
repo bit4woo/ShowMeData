@@ -1,11 +1,8 @@
 package main;
 
-import org.json.JSONObject;
+import com.google.gson.Gson;
 
-import com.alibaba.fastjson.JSON;
-
-public class LineConfig {
-
+public class Config {
 
 	private String python3Path = "C:\\Python37\\python.exe";
 	private String browserPath = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
@@ -36,13 +33,10 @@ public class LineConfig {
 	}
 
 	public String ToJson() {
-		return JSONObject.toString();
-		//https://blog.csdn.net/qq_27093465/article/details/73277291
-		//return new Gson().toJson(this);
+		return new Gson().toJson(this);
 	}
 
-	public  static LineConfig FromJson(String instanceString) {// throws Exception {
-		return JSON.parseObject(instanceString,LineConfig.class);
-		//return new Gson().fromJson(instanceString, DomainObject.class);
+	public  static Config FromJson(String instanceString) {// throws Exception {
+		return new Gson().fromJson(instanceString, Config.class);
 	}
 }

@@ -1,9 +1,11 @@
 package main;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,9 +15,9 @@ import org.json.JSONObject;
  */
 public class JSONHandler {
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws Exception {
 		System.out.println();
-		test();
+		test1();
 	}
 	
 	//org.json
@@ -47,6 +49,8 @@ public class JSONHandler {
 		}
 	}
 	
+	// json中某个key的value值，可能的类型有：
+	// boolean number string JSONObject JSONArray
 	public static ArrayList<String> grepValueFromJson(String jsonString,String toFind) throws Exception {
 		ArrayList<String> result = new ArrayList<String>();
 		
@@ -62,10 +66,7 @@ public class JSONHandler {
 					result.add(value);
 				}
 				
-				// if it's jsonobject or jsonarray
-				if (isJSONObject(value) || isJSONArray(value)) {
-					result.addAll(grepValueFromJson(value,toFind));
-				}
+				result.addAll(grepValueFromJson(value,toFind));
 			}
 		}else if(isJSONArray(jsonString)){
 			//JSONArray中每个元素都是JSON
@@ -75,9 +76,17 @@ public class JSONHandler {
 				result.addAll(grepValueFromJson(item,toFind));
 			}
 		}else {
-			throw new Exception("wrong json formate");
+			//boolean string number --do nothing
 		}
 		return result;
+	}
+	
+	public static void test1() throws Exception {
+		String json = FileUtils.readFileToString(new File("D:\\user\\01374214\\desktop\\fengdong-system-id.txt"));
+		//JSONObject aaa= new JSONObject(json);
+		ArrayList<String> result = grepValueFromJson(json,"entryptId");
+		//aaa.get("data");
+		System.out.println(result);
 	}
 	
 	public static void test() {
