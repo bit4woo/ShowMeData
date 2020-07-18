@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.net.URI;
 
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -35,8 +36,9 @@ public class MainPanel extends JPanel {
 
 	private ConfigPanel configPanel;
 	private workPanel workPanel;
-
-	public static JTextField proxyTextField;
+	
+	private static JCheckBox proxyCheck;
+	private static JTextField proxyTextField;
 	public static boolean inputTextAreaChanged = true;
 	public static JTextField BrowserPath;
 	public static Config config;
@@ -67,6 +69,12 @@ public class MainPanel extends JPanel {
 	public static String getFullToolName(){
 		return ToolName+" "+Version+" "+Author;
 	}
+	public static String getProxy() {
+		if(proxyCheck.isSelected()) {
+			return proxyTextField.getText().trim();
+		}
+		return "";
+	}
 
 	public MainPanel() {
 		setForeground(Color.DARK_GRAY);//构造函数
@@ -85,8 +93,8 @@ public class MainPanel extends JPanel {
 		fl_HeaderPanel.setAlignment(FlowLayout.LEFT);
 		this.add(HeaderPanel, BorderLayout.NORTH);
 
-		JLabel lblNewLabelNull = new JLabel("proxy");
-		HeaderPanel.add(lblNewLabelNull);
+		proxyCheck = new JCheckBox("proxy");
+		HeaderPanel.add(proxyCheck);
 
 		proxyTextField = new JTextField("127.0.0.1:8080");
 		HeaderPanel.add(proxyTextField);

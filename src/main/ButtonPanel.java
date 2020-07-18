@@ -99,7 +99,7 @@ public class ButtonPanel extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 				try {
 					String content = workPanel.getInputTextArea().getText();
-					String proxy = MainPanel.proxyTextField.getText();
+					String proxy = MainPanel.getProxy();
 					Request request;
 					if (isUrl(content)) {
 						request = new Request(content);
