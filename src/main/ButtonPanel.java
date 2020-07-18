@@ -21,6 +21,11 @@ import javax.swing.JTextArea;
 
 import org.apache.commons.text.StringEscapeUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+
 public class ButtonPanel extends JPanel{
 
 	JTextArea inputTextArea;
@@ -49,14 +54,13 @@ public class ButtonPanel extends JPanel{
 	}
 
 	ButtonPanel(){
-		freshCurrentInputOutput();
 		this.config = MainPanel.config;
 
 		//四分之三部分放一个panel，里面放操作按钮
-		JPanel threeFourthPanel = this;
-		threeFourthPanel.setLayout(new FlowLayout());
+		JPanel buttonPanel = this;
+		buttonPanel.setLayout(new FlowLayout());
 		//https://stackoverflow.com/questions/5709690/how-do-i-make-this-flowlayout-wrap-within-its-jsplitpane
-		threeFourthPanel.setMinimumSize(new Dimension(0, 0));//为了让button自动换行
+		buttonPanel.setMinimumSize(new Dimension(0, 0));//为了让button自动换行
 
 		/*
 		JButton btnOpenurls = new JButton("OpenURLs");
@@ -86,47 +90,44 @@ public class ButtonPanel extends JPanel{
 		 */
 
 		JButton rows2List = new JButton("Rows To List");
-		threeFourthPanel.add(rows2List);
 		rows2List.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					List<String> content = Commons.getLinesFromTextArea(inputTextArea);					
-					outputTextArea.setText(content.toString());
+					List<String> content = Commons.getLinesFromTextArea(workPanel.getInputTextArea());					
+					workPanel.getOutputTextArea().setText(content.toString());
 				} catch (Exception e1) {
-					outputTextArea.setText(e1.getMessage());
+					workPanel.getOutputTextArea().setText(e1.getMessage());
 				}
 			}
 
 		});
 
 		JButton rows2Array = new JButton("Rows To Array");
-		threeFourthPanel.add(rows2Array);
 		rows2Array.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					List<String> content = Commons.getLinesFromTextArea(inputTextArea);
+					List<String> content = Commons.getLinesFromTextArea(workPanel.getInputTextArea());
 					for (int i=0;i<content.size();i++) {
 						content.set(i, "\""+content.get(i)+"\"");
 					}
 
-					outputTextArea.setText(String.join(",", content));
+					workPanel.getOutputTextArea().setText(String.join(",", content));
 				} catch (Exception e1) {
-					outputTextArea.setText(e1.getMessage());
+					workPanel.getOutputTextArea().setText(e1.getMessage());
 				}
 			}
 
 		});
 
 
-		JButton btnGrep = new JButton("Grep Json");
-		threeFourthPanel.add(btnGrep);
-		btnGrep.addActionListener(new ActionListener() {
+		JButton btnGrepJson = new JButton("Grep by JSON Key");
+		btnGrepJson.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					String content = inputTextArea.getText();
+					String content = workPanel.getInputTextArea().getText();
 					String toFind = JOptionPane.showInputDialog("to find which value", null);
 					if (toFind == null) {
 						return;
@@ -138,19 +139,18 @@ public class ButtonPanel extends JPanel{
 						//								stdout.println("##################Result of Grep JSON##################");
 						//								stdout.println();
 
-						outputTextArea.setText(String.join(System.lineSeparator(), result));
+						workPanel.getOutputTextArea().setText(String.join(System.lineSeparator(), result));
 					}
 
 				} catch (Exception e1) {
-					outputTextArea.setText(e1.getMessage());
+					workPanel.getOutputTextArea().setText(e1.getMessage());
 					//e1.printStackTrace(stderr);
 				}
 			}
 		});
 
-		JButton btnLine = new JButton("Grep Line");
-		threeFourthPanel.add(btnLine);
-		btnLine.addActionListener(new ActionListener() {
+		JButton btnGrepLine = new JButton("Grep Line by content");
+		btnGrepLine.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -159,18 +159,18 @@ public class ButtonPanel extends JPanel{
 					if (toFind == null) {
 						return;
 					} else {
-						List<String> content = Commons.getLinesFromTextArea(inputTextArea);
+						List<String> content = Commons.getLinesFromTextArea(workPanel.getInputTextArea());
 						for (String item:content) {
 							if (item.toLowerCase().contains(toFind.toLowerCase().trim())) {
 								result.add(item); 
 							}
 						}
 						//outputTextArea.setText(result.toString());
-						outputTextArea.setText(String.join(System.lineSeparator(), result));
+						workPanel.getOutputTextArea().setText(String.join(System.lineSeparator(), result));
 					}
 
 				} catch (Exception e1) {
-					outputTextArea.setText(e1.getMessage());
+					workPanel.getOutputTextArea().setText(e1.getMessage());
 					//e1.printStackTrace(stderr);
 				}
 			}
@@ -178,7 +178,6 @@ public class ButtonPanel extends JPanel{
 
 
 		JButton btnAddPrefix = new JButton("Add Prefix/Suffix");
-		threeFourthPanel.add(btnAddPrefix);
 		btnAddPrefix.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -197,45 +196,86 @@ public class ButtonPanel extends JPanel{
 							toAddSuffix = "";
 						}
 
-						List<String> content = Commons.getLinesFromTextArea(inputTextArea);
+						List<String> content = Commons.getLinesFromTextArea(workPanel.getInputTextArea());
 						for (String item:content) {
 							item = toAddPrefix.trim()+item+toAddSuffix.trim();
 							result.add(item); 
 						}
-						outputTextArea.setText(String.join(System.lineSeparator(), result));
+						workPanel.getOutputTextArea().setText(String.join(System.lineSeparator(), result));
 					}
 				} catch (Exception e1) {
-					outputTextArea.setText(e1.getMessage());
+					workPanel.getOutputTextArea().setText(e1.getMessage());
 				}
 			}
 		});
 
+		JButton btnRemovePrefix = new JButton("Remove Prefix/Suffix");
+		btnAddPrefix.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					String Prefix = JOptionPane.showInputDialog("prefix to remove", null);
+					String Suffix = JOptionPane.showInputDialog("suffix to remove", null);
+					ArrayList<String> result = new ArrayList<String>();
+					if (Prefix == null && Suffix == null) {
+						return;
+					} else {
+						if (Prefix == null) {
+							Prefix = "";
+						}
 
-		JButton btnRegexGrep = new JButton("Regex Grep");
-		btnRegexGrep.setEnabled(false);
-		threeFourthPanel.add(btnRegexGrep);
+						if (Suffix == null) {
+							Suffix = "";
+						}
+
+						List<String> content = Commons.getLinesFromTextArea(workPanel.getInputTextArea());
+						for (String item:content) {
+							if (item.startsWith(Prefix)) {
+								item = item.replaceFirst(Prefix, "");
+							}
+							if (item.endsWith(Suffix)) {
+								item = reverse(item).replaceFirst(reverse(Suffix), "");
+								item = reverse(item);
+							}
+							result.add(item); 
+						}
+						workPanel.getOutputTextArea().setText(String.join(System.lineSeparator(), result));
+					}
+				} catch (Exception e1) {
+					workPanel.getOutputTextArea().setText(e1.getMessage());
+				}
+			}
+			
+			public String reverse(String str) {
+				if (str == null) {
+					return null;
+				}
+				return new StringBuffer(str).reverse().toString();
+			}
+		});
+
+		JButton btnRegexGrep = new JButton("Grep by regex");
 		btnRegexGrep.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					//					String toFind = JOptionPane.showInputDialog("to find which value", null);
-					//					if (toFind == null) {
-					//						return;
-					//					} else {
+					String toFind = JOptionPane.showInputDialog("regex to find", null);
+					if (toFind == null) {
+						return;
+					} else {
 					ArrayList<String> result = new ArrayList<String>();
-					//主要目的是找url        path: '/admin/menu',
-					String webpack_PATTERN = "\'/([0-9a-z])*\'"; //TODO 正则表达不正确
-					Pattern pRegex = Pattern.compile(webpack_PATTERN);
-					String content = inputTextArea.getText();
+					//String webpack_PATTERN = "\'/([0-9a-z])*\'"; //TODO 正则表达不正确
+					Pattern pRegex = Pattern.compile(toFind);
+					String content = workPanel.getInputTextArea().getText();
 					Matcher matcher = pRegex.matcher(content);
 					while (matcher.find()) {//多次查找
 						result.add(matcher.group());
 					}
-					outputTextArea.setText(result.toString());
-					//}
+					workPanel.getOutputTextArea().setText(result.toString());
+					}
 				} catch (Exception e1) {
-					outputTextArea.setText(e1.getMessage());
+					workPanel.getOutputTextArea().setText(e1.getMessage());
 					e1.printStackTrace(stderr);
 				}
 			}
@@ -243,63 +283,138 @@ public class ButtonPanel extends JPanel{
 		});
 
 		JButton btnIPsToCIDR = new JButton("IPs To CIDR");
-		threeFourthPanel.add(btnIPsToCIDR);
 		btnIPsToCIDR.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				freshCurrentInputOutput();
 				try {
-					List<String> IPs = Commons.getLinesFromTextArea(inputTextArea);
+					List<String> IPs = Commons.getLinesFromTextArea(workPanel.getInputTextArea());
 					Set<String> subnets = Commons.toSmallerSubNets(new HashSet<String>(IPs));
-					outputTextArea.setText(String.join(System.lineSeparator(), subnets));
+					workPanel.getOutputTextArea().setText(String.join(System.lineSeparator(), subnets));
 				} catch (Exception e1) {
-					outputTextArea.setText(e1.getMessage());
+					workPanel.getOutputTextArea().setText(e1.getMessage());
 					e1.printStackTrace(stderr);
 				}
 			}
 		});
 
 		JButton btnCIDRToIPs = new JButton("CIDR To IPs");
-		threeFourthPanel.add(btnCIDRToIPs);
 		btnCIDRToIPs.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				freshCurrentInputOutput();
 				try {
-					List<String> subnets = Commons.getLinesFromTextArea(inputTextArea);
+					List<String> subnets = Commons.getLinesFromTextArea(workPanel.getInputTextArea());
 					List<String> IPs = Commons.toIPList(subnets);// 当前所有title结果计算出的IP集合
-					outputTextArea.setText(String.join(System.lineSeparator(), IPs));
+					workPanel.getOutputTextArea().setText(String.join(System.lineSeparator(), IPs));
 				} catch (Exception e1) {
-					outputTextArea.setText(e1.getMessage());
+					workPanel.getOutputTextArea().setText(e1.getMessage());
 					e1.printStackTrace(stderr);
 				}
 			}
 		});
 
-		JButton unescapeJava = new JButton("unescapeJava");
-		threeFourthPanel.add(unescapeJava);
-		unescapeJava.addActionListener(new ActionListener() {
+		JButton unicodeDecode = new JButton("Decode Unicode");
+		unicodeDecode.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				freshCurrentInputOutput();
 				try {
-					outputTextArea.setText(StringEscapeUtils.unescapeJava(inputTextArea.getText()));
+					String out = StringEscapeUtils.unescapeJava(inputTextArea.getText());
+					if (!out.equals(inputTextArea.getText())) {
+						workPanel.getOutputTextArea().setText(out);
+					}
 				} catch (Exception e1) {
-					outputTextArea.setText(e1.getMessage());
+					workPanel.getOutputTextArea().setText(e1.getMessage());
 					e1.printStackTrace(stderr);
 				}
 			}
 		});
 
-		JButton unescapeHTML = new JButton("unescapeHTML");
-		threeFourthPanel.add(unescapeHTML);
+		JButton unescapeHTML = new JButton("Unescape HTML");
 		unescapeHTML.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				freshCurrentInputOutput();
 				try {
-					outputTextArea.setText(StringEscapeUtils.unescapeHtml4(inputTextArea.getText()));
+					String out = StringEscapeUtils.unescapeHtml4(inputTextArea.getText());
+					if (!out.equals(inputTextArea.getText())) {
+						workPanel.getOutputTextArea().setText(out);
+					}
 				} catch (Exception e1) {
-					outputTextArea.setText(e1.getMessage());
+					workPanel.getOutputTextArea().setText(e1.getMessage());
 					e1.printStackTrace(stderr);
 				}
 			}
 		});
+		
+		JButton removeLineChar = new JButton("Remove \\n\\r");
+		removeLineChar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				freshCurrentInputOutput();
+				try {
+					String out = inputTextArea.getText().replaceAll("\n", "").replaceAll("\r", "");
+					if (!out.equals(inputTextArea.getText())) {
+						workPanel.getOutputTextArea().setText(out);
+					}
+				} catch (Exception e1) {
+					workPanel.getOutputTextArea().setText(e1.getMessage());
+					e1.printStackTrace(stderr);
+				}
+			}
+		});
+		
+		JButton formateJson = new JButton("Formate JSON");
+		formateJson.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				freshCurrentInputOutput();
+				try {
+					String out = beauty(inputTextArea.getText());
+					
+					if (!out.equals(inputTextArea.getText())) {
+						workPanel.getOutputTextArea().setText(out);
+					}
+				} catch (Exception e1) {
+					workPanel.getOutputTextArea().setText(e1.getMessage());
+					e1.printStackTrace(stderr);
+				}
+			}
+			
+			public String beauty(String inputJson) {
+				//Take the input, determine request/response, parse as json, then print prettily.
+				Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().serializeNulls().create();
+				JsonParser jp = new JsonParser();
+				JsonElement je = jp.parse(inputJson);
+				return gson.toJson(je);
+			}
+		});
+		
+		//数据格式转换类
+		buttonPanel.add(rows2List);
+		buttonPanel.add(rows2Array);
+		buttonPanel.add(btnIPsToCIDR);
+		buttonPanel.add(btnCIDRToIPs);
+		
+		buttonPanel.add(new JButton(System.lineSeparator()));
+		
+		//数据提取过滤类
+		buttonPanel.add(btnGrepJson);
+		buttonPanel.add(btnGrepLine);
+		buttonPanel.add(btnRegexGrep);
+		
+		buttonPanel.add(new JButton(System.lineSeparator()));
+		
+		//每行处理
+		buttonPanel.add(btnAddPrefix);
+		buttonPanel.add(btnRemovePrefix);
+		buttonPanel.add(removeLineChar);
+
+		buttonPanel.add(new JButton(System.lineSeparator()));
+		//整体处理、格式化
+		buttonPanel.add(unicodeDecode);
+		buttonPanel.add(unescapeHTML);
+		buttonPanel.add(formateJson);
 	}
 }
