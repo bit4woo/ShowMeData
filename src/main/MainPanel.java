@@ -95,6 +95,7 @@ public class MainPanel extends JPanel {
 
 		///////////////////////body Panel//////////////
 
+		/*
 		JTabbedPane CentertabbedWrapper = new JTabbedPane();
 		workPanel = new workPanel();
 		configPanel = new ConfigPanel(config);
@@ -102,6 +103,9 @@ public class MainPanel extends JPanel {
 		CentertabbedWrapper.addTab("config", null,configPanel,null);
 
 		this.add(CentertabbedWrapper,BorderLayout.CENTER);
+		*/
+		
+		this.add(new workPanel(),BorderLayout.CENTER);
 		///////////////////////////Footer Panel//////////////////
 
 
