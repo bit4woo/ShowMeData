@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +26,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+
+import httpbase.DoRequest;
+import httpbase.Request;
+import httpbase.Response;
 
 public class ButtonPanel extends JPanel{
 
@@ -88,6 +93,36 @@ public class ButtonPanel extends JPanel{
 
 		});
 		 */
+		JButton doRequest = new JButton("Do Request");
+		doRequest.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					String content = workPanel.getInputTextArea().getText();
+					String proxy = MainPanel.proxyTextField.getText();
+					Request request;
+					if (isUrl(content)) {
+						request = new Request(content);
+					}else {
+						request = new Request(false,content.getBytes());
+					}
+					Response respone = DoRequest.makeRequest(request,proxy);
+					workPanel.getOutputTextArea().setText(new String(respone.getBody()));
+				} catch (Exception e1) {
+					workPanel.getOutputTextArea().setText(e1.toString());
+					e1.printStackTrace();
+				}
+			}
+			public boolean isUrl(String content) {
+				try {
+					URL url = new URL(content);
+					return true;
+				}catch(Exception e) {
+					return false;
+				}
+			}
+
+		});
 
 		JButton rows2List = new JButton("Rows To List");
 		rows2List.addActionListener(new ActionListener() {
@@ -245,7 +280,7 @@ public class ButtonPanel extends JPanel{
 					workPanel.getOutputTextArea().setText(e1.getMessage());
 				}
 			}
-			
+
 			public String reverse(String str) {
 				if (str == null) {
 					return null;
@@ -264,15 +299,15 @@ public class ButtonPanel extends JPanel{
 					if (toFind == null) {
 						return;
 					} else {
-					ArrayList<String> result = new ArrayList<String>();
-					//String webpack_PATTERN = "\'/([0-9a-z])*\'"; //TODO 正则表达不正确
-					Pattern pRegex = Pattern.compile(toFind);
-					String content = workPanel.getInputTextArea().getText();
-					Matcher matcher = pRegex.matcher(content);
-					while (matcher.find()) {//多次查找
-						result.add(matcher.group());
-					}
-					workPanel.getOutputTextArea().setText(result.toString());
+						ArrayList<String> result = new ArrayList<String>();
+						//String webpack_PATTERN = "\'/([0-9a-z])*\'"; //TODO 正则表达不正确
+						Pattern pRegex = Pattern.compile(toFind);
+						String content = workPanel.getInputTextArea().getText();
+						Matcher matcher = pRegex.matcher(content);
+						while (matcher.find()) {//多次查找
+							result.add(matcher.group());
+						}
+						workPanel.getOutputTextArea().setText(result.toString());
 					}
 				} catch (Exception e1) {
 					workPanel.getOutputTextArea().setText(e1.getMessage());
@@ -347,7 +382,7 @@ public class ButtonPanel extends JPanel{
 				}
 			}
 		});
-		
+
 		JButton removeLineChar = new JButton("Remove \\n\\r");
 		removeLineChar.addActionListener(new ActionListener() {
 			@Override
@@ -364,7 +399,7 @@ public class ButtonPanel extends JPanel{
 				}
 			}
 		});
-		
+
 		JButton formateJson = new JButton("Formate JSON");
 		formateJson.addActionListener(new ActionListener() {
 			@Override
@@ -372,7 +407,7 @@ public class ButtonPanel extends JPanel{
 				freshCurrentInputOutput();
 				try {
 					String out = beauty(inputTextArea.getText());
-					
+
 					if (!out.equals(inputTextArea.getText())) {
 						workPanel.getOutputTextArea().setText(out);
 					}
@@ -381,7 +416,7 @@ public class ButtonPanel extends JPanel{
 					e1.printStackTrace(stderr);
 				}
 			}
-			
+
 			public String beauty(String inputJson) {
 				//Take the input, determine request/response, parse as json, then print prettily.
 				Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().serializeNulls().create();
@@ -390,22 +425,23 @@ public class ButtonPanel extends JPanel{
 				return gson.toJson(je);
 			}
 		});
-		
+
+		buttonPanel.add(doRequest);
 		//数据格式转换类
 		buttonPanel.add(rows2List);
 		buttonPanel.add(rows2Array);
 		buttonPanel.add(btnIPsToCIDR);
 		buttonPanel.add(btnCIDRToIPs);
-		
+
 		buttonPanel.add(new JButton(System.lineSeparator()));
-		
+
 		//数据提取过滤类
 		buttonPanel.add(btnGrepJson);
 		buttonPanel.add(btnGrepLine);
 		buttonPanel.add(btnRegexGrep);
-		
+
 		buttonPanel.add(new JButton(System.lineSeparator()));
-		
+
 		//每行处理
 		buttonPanel.add(btnAddPrefix);
 		buttonPanel.add(btnRemovePrefix);

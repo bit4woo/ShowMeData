@@ -14,7 +14,6 @@ import java.net.URI;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -103,8 +102,8 @@ public class MainPanel extends JPanel {
 		CentertabbedWrapper.addTab("config", null,configPanel,null);
 
 		this.add(CentertabbedWrapper,BorderLayout.CENTER);
-		*/
-		
+		 */
+
 		this.add(new workPanel(),BorderLayout.CENTER);
 		///////////////////////////Footer Panel//////////////////
 

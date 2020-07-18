@@ -77,6 +77,14 @@ public class DoRequest {
 		}
 	}
 
+	public static Response makeRequest(Request request,String proxy) throws Exception {
+		if (request.getProtocol().equalsIgnoreCase("https")) {
+			return makeHttpsRequest(request,proxy);
+		}else {
+			return makeHttpRequest(request,proxy);
+		}
+	}
+
 	private static byte[] readInputStream(InputStream inStream) throws Exception{  
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();  
 		byte[] buffer = new byte[1024];  
@@ -97,11 +105,15 @@ public class DoRequest {
 		//Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8080));
 		//HttpURLConnection conn = (HttpURLConnection)url.openConnection(proxy);
 		HttpURLConnection conn;
-		if (proxyUrl == null) {
+
+		if (proxyUrl == null || proxyUrl == "") {
 			conn = (HttpURLConnection) httpUrl.openConnection();   //Connection reset error when certification is not match
 
 			//可以使用HttpURLConnection请求https的链接，但是忽略证书时会出错。
 		}else {
+			if (!proxyUrl.toLowerCase().startsWith("http")){
+				proxyUrl = req.getProtocol()+"://"+proxyUrl;
+			}
 			URL url = new URL(proxyUrl);
 			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(url.getHost(), url.getPort()));
 			conn = (HttpURLConnection) httpUrl.openConnection(proxy);
@@ -114,7 +126,8 @@ public class DoRequest {
 		conn.setConnectTimeout(5 * 1000);
 		conn.setReadTimeout(10*1000);
 
-		if (req.getBody() != null) {
+		//注意：执行这部分代码（写入body）请求方法会自动转成POST！
+		if (req.getBody() != null && !new String(req.getBody()).equals("")) {
 			conn.setDoOutput(true);
 			DataOutputStream out = new DataOutputStream(conn.getOutputStream()); 
 			out.write(req.getBody());
@@ -122,6 +135,7 @@ public class DoRequest {
 			out.close();
 		}
 
+		System.out.println(conn.getRequestMethod());
 		InputStream inStream = conn.getInputStream();//InputStream的内容对应的是response的body部分
 
 		HashMap<String,String> headerMap = new HashMap<String,String>();
@@ -153,14 +167,17 @@ public class DoRequest {
 		sslContext.init(null, tm, new java.security.SecureRandom());
 		HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 		HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);//do not check certification
-		
+
 		HttpsURLConnection conn;
-		
+
 		if (proxyUrl == null || proxyUrl == "") {
 			conn = (HttpsURLConnection) httpsUrl.openConnection();   //Connection reset error when certification is not match
 
 			//可以使用HttpURLConnection请求https的链接，但是忽略证书时会出错。
 		}else {
+			if (!proxyUrl.toLowerCase().startsWith("http")){
+				proxyUrl = req.getProtocol()+"://"+proxyUrl;
+			}
 			URL url = new URL(proxyUrl);
 			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(url.getHost(), url.getPort()));
 			conn = (HttpsURLConnection) httpsUrl.openConnection(proxy);
@@ -174,7 +191,8 @@ public class DoRequest {
 		conn.setConnectTimeout(5 * 1000);
 		conn.setReadTimeout(10*1000);
 
-		if (req.getBody() != null) {
+		//注意：执行这部分代码（写入body）请求方法会自动转成POST！
+		if (req.getBody() != null && !new String(req.getBody()).equals("")) {
 			conn.setDoOutput(true);
 			DataOutputStream out = new DataOutputStream(conn.getOutputStream()); 
 			out.write(req.getBody());
