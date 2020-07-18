@@ -13,10 +13,8 @@ import java.net.URI;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -31,15 +29,15 @@ import bsh.This;
 
 public class MainPanel extends JPanel {
 
-	private JLabel lblNewLabel_2;
+	private JLabel lblGithub;
 
 	PrintWriter stdout;
 	PrintWriter stderr;
 
 	private ConfigPanel configPanel;
 	private workPanel workPanel;
-	public static JTextArea inputTextArea;
-	public static JTextArea outputTextArea;
+
+	public static JTextField proxyTextField;
 	public static boolean inputTextAreaChanged = true;
 	public static JTextField BrowserPath;
 	public static Config config;
@@ -88,11 +86,15 @@ public class MainPanel extends JPanel {
 		fl_HeaderPanel.setAlignment(FlowLayout.LEFT);
 		this.add(HeaderPanel, BorderLayout.NORTH);
 
-		JLabel lblNewLabelNull = new JLabel("  ");
+		JLabel lblNewLabelNull = new JLabel("proxy");
 		HeaderPanel.add(lblNewLabelNull);
-		
+
+		proxyTextField = new JTextField("127.0.0.1:8080");
+		HeaderPanel.add(proxyTextField);
+		proxyTextField.setColumns(25);
+
 		///////////////////////body Panel//////////////
-		
+
 		JTabbedPane CentertabbedWrapper = new JTabbedPane();
 		workPanel = new workPanel();
 		configPanel = new ConfigPanel(config);
@@ -109,9 +111,9 @@ public class MainPanel extends JPanel {
 		fl_FooterPanel.setAlignment(FlowLayout.LEFT);
 		this.add(footerPanel, BorderLayout.SOUTH);
 
-		lblNewLabel_2 = new JLabel(getFullToolName()+"    "+Github);
-		lblNewLabel_2.setFont(new Font("宋体", Font.BOLD, 12));
-		lblNewLabel_2.addMouseListener(new MouseAdapter() {
+		lblGithub = new JLabel(getFullToolName()+"    "+Github);
+		lblGithub.setFont(new Font("宋体", Font.BOLD, 12));
+		lblGithub.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
@@ -126,14 +128,14 @@ public class MainPanel extends JPanel {
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				lblNewLabel_2.setForeground(Color.BLUE);
+				lblGithub.setForeground(Color.BLUE);
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
-				lblNewLabel_2.setForeground(Color.BLACK);
+				lblGithub.setForeground(Color.BLACK);
 			}
 		});
-		footerPanel.add(lblNewLabel_2);
+		footerPanel.add(lblGithub);
 	}
 
 }

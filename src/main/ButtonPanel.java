@@ -7,9 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -24,7 +22,7 @@ import javax.swing.JTextArea;
 import org.apache.commons.text.StringEscapeUtils;
 
 public class ButtonPanel extends JPanel{
-	
+
 	JTextArea inputTextArea;
 	JTextArea outputTextArea;
 	Config config;
@@ -45,9 +43,13 @@ public class ButtonPanel extends JPanel{
 		});
 	}
 
+	public void freshCurrentInputOutput(){
+		this.inputTextArea = workPanel.getInputTextArea();
+		this.outputTextArea = workPanel.getOutputTextArea();
+	}
+
 	ButtonPanel(){
-		this.inputTextArea = MainPanel.inputTextArea;
-		this.outputTextArea = MainPanel.outputTextArea;
+		freshCurrentInputOutput();
 		this.config = MainPanel.config;
 
 		//四分之三部分放一个panel，里面放操作按钮
@@ -56,6 +58,7 @@ public class ButtonPanel extends JPanel{
 		//https://stackoverflow.com/questions/5709690/how-do-i-make-this-flowlayout-wrap-within-its-jsplitpane
 		threeFourthPanel.setMinimumSize(new Dimension(0, 0));//为了让button自动换行
 
+		/*
 		JButton btnOpenurls = new JButton("OpenURLs");
 		threeFourthPanel.add(btnOpenurls);
 		btnOpenurls.addActionListener(new ActionListener() {
@@ -64,7 +67,7 @@ public class ButtonPanel extends JPanel{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				urls = Arrays.asList(MainPanel.inputTextArea.getText().replaceAll(" ","").replaceAll("\r\n", "\n").split("\n"));
+				urls = Arrays.asList(inputTextArea.getText().replaceAll(" ","").replaceAll("\r\n", "\n").split("\n"));
 				it = urls.iterator();
 				try {
 					int i =10;
@@ -80,6 +83,7 @@ public class ButtonPanel extends JPanel{
 			}
 
 		});
+		 */
 
 		JButton rows2List = new JButton("Rows To List");
 		threeFourthPanel.add(rows2List);
@@ -142,7 +146,6 @@ public class ButtonPanel extends JPanel{
 					//e1.printStackTrace(stderr);
 				}
 			}
-
 		});
 
 		JButton btnLine = new JButton("Grep Line");
@@ -212,7 +215,6 @@ public class ButtonPanel extends JPanel{
 		btnRegexGrep.setEnabled(false);
 		threeFourthPanel.add(btnRegexGrep);
 		btnRegexGrep.addActionListener(new ActionListener() {
-			
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
