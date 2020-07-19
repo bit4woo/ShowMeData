@@ -151,8 +151,8 @@ public class ButtonPanel extends JPanel{
 					for (int i=0;i<content.size();i++) {
 						content.set(i, "\""+content.get(i)+"\"");
 					}
-
-					workPanel.getOutputTextArea().setText(String.join(",", content));
+					String out = "{"+String.join(",", content)+"}";
+					workPanel.getOutputTextArea().setText(out);
 				} catch (Exception e1) {
 					workPanel.getOutputTextArea().setText(e1.getMessage());
 					e1.printStackTrace(stderr);
@@ -488,8 +488,11 @@ public class ButtonPanel extends JPanel{
 				return gson.toJson(je);
 			}
 		});
-
+		
+		
+		//数据获取
 		buttonPanel.add(doRequest);
+		
 		//数据格式转换类
 		buttonPanel.add(rows2List);
 		buttonPanel.add(rows2Array);
