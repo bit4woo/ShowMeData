@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -110,7 +113,7 @@ public class ButtonPanel extends JPanel{
 					workPanel.getOutputTextArea().setText(new String(respone.getBody()));
 				} catch (Exception e1) {
 					workPanel.getOutputTextArea().setText(e1.toString());
-					e1.printStackTrace();
+					e1.printStackTrace(stderr);
 				}
 			}
 			public boolean isUrl(String content) {
@@ -133,6 +136,7 @@ public class ButtonPanel extends JPanel{
 					workPanel.getOutputTextArea().setText(content.toString());
 				} catch (Exception e1) {
 					workPanel.getOutputTextArea().setText(e1.getMessage());
+					e1.printStackTrace(stderr);
 				}
 			}
 
@@ -151,10 +155,33 @@ public class ButtonPanel extends JPanel{
 					workPanel.getOutputTextArea().setText(String.join(",", content));
 				} catch (Exception e1) {
 					workPanel.getOutputTextArea().setText(e1.getMessage());
+					e1.printStackTrace(stderr);
 				}
 			}
 
 		});
+		
+		/*
+		JButton rows2JSON = new JButton("Rows To JSON");
+		rows2JSON.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					String key = JOptionPane.showInputDialog("Key of Json", null);
+					HashMap<String, String> map= new HashMap<String,String>();
+					List<String> content = Commons.getLinesFromTextArea(workPanel.getInputTextArea());
+					for (int i=0;i<content.size();i++) {
+						map.put(key, content.get(i));
+					}
+
+					workPanel.getOutputTextArea().setText(map.toString());
+				} catch (Exception e1) {
+					workPanel.getOutputTextArea().setText(e1.getMessage());
+					e1.printStackTrace(stderr);
+				}
+			}
+		});
+		*/
 
 
 		JButton btnGrepJson = new JButton("Grep by JSON Key");
@@ -179,12 +206,12 @@ public class ButtonPanel extends JPanel{
 
 				} catch (Exception e1) {
 					workPanel.getOutputTextArea().setText(e1.getMessage());
-					//e1.printStackTrace(stderr);
+					e1.printStackTrace(stderr);
 				}
 			}
 		});
 
-		JButton btnGrepLine = new JButton("Grep Line by content");
+		JButton btnGrepLine = new JButton("Grep Line");
 		btnGrepLine.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -206,7 +233,7 @@ public class ButtonPanel extends JPanel{
 
 				} catch (Exception e1) {
 					workPanel.getOutputTextArea().setText(e1.getMessage());
-					//e1.printStackTrace(stderr);
+					e1.printStackTrace(stderr);
 				}
 			}
 		});
@@ -240,12 +267,13 @@ public class ButtonPanel extends JPanel{
 					}
 				} catch (Exception e1) {
 					workPanel.getOutputTextArea().setText(e1.getMessage());
+					e1.printStackTrace(stderr);
 				}
 			}
 		});
 
 		JButton btnRemovePrefix = new JButton("Remove Prefix/Suffix");
-		btnAddPrefix.addActionListener(new ActionListener() {
+		btnRemovePrefix.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -278,6 +306,7 @@ public class ButtonPanel extends JPanel{
 					}
 				} catch (Exception e1) {
 					workPanel.getOutputTextArea().setText(e1.getMessage());
+					e1.printStackTrace(stderr);
 				}
 			}
 
@@ -365,6 +394,23 @@ public class ButtonPanel extends JPanel{
 				}
 			}
 		});
+		
+		JButton unicodeEncode = new JButton("Encode Unicode");
+		unicodeEncode.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				freshCurrentInputOutput();
+				try {
+					String out = StringEscapeUtils.escapeJava(inputTextArea.getText());
+					if (!out.equals(inputTextArea.getText())) {
+						workPanel.getOutputTextArea().setText(out);
+					}
+				} catch (Exception e1) {
+					workPanel.getOutputTextArea().setText(e1.getMessage());
+					e1.printStackTrace(stderr);
+				}
+			}
+		});
 
 		JButton unescapeHTML = new JButton("Unescape HTML");
 		unescapeHTML.addActionListener(new ActionListener() {
@@ -390,6 +436,23 @@ public class ButtonPanel extends JPanel{
 				freshCurrentInputOutput();
 				try {
 					String out = inputTextArea.getText().replaceAll("\n", "").replaceAll("\r", "");
+					if (!out.equals(inputTextArea.getText())) {
+						workPanel.getOutputTextArea().setText(out);
+					}
+				} catch (Exception e1) {
+					workPanel.getOutputTextArea().setText(e1.getMessage());
+					e1.printStackTrace(stderr);
+				}
+			}
+		});
+		
+		JButton removeSpace = new JButton("Remove Space");
+		removeSpace.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				freshCurrentInputOutput();
+				try {
+					String out = inputTextArea.getText().replaceAll(" ", "").replaceAll("\t", "");
 					if (!out.equals(inputTextArea.getText())) {
 						workPanel.getOutputTextArea().setText(out);
 					}
@@ -430,26 +493,29 @@ public class ButtonPanel extends JPanel{
 		//数据格式转换类
 		buttonPanel.add(rows2List);
 		buttonPanel.add(rows2Array);
+		//buttonPanel.add(rows2JSON);
 		buttonPanel.add(btnIPsToCIDR);
 		buttonPanel.add(btnCIDRToIPs);
 
-		buttonPanel.add(new JButton(System.lineSeparator()));
+		buttonPanel.add(new JButton("----------"));
 
 		//数据提取过滤类
 		buttonPanel.add(btnGrepJson);
 		buttonPanel.add(btnGrepLine);
 		buttonPanel.add(btnRegexGrep);
 
-		buttonPanel.add(new JButton(System.lineSeparator()));
+		buttonPanel.add(new JButton("----------"));
 
 		//每行处理
 		buttonPanel.add(btnAddPrefix);
 		buttonPanel.add(btnRemovePrefix);
 		buttonPanel.add(removeLineChar);
+		buttonPanel.add(removeSpace);
 
-		buttonPanel.add(new JButton(System.lineSeparator()));
+		buttonPanel.add(new JButton("----------"));
 		//整体处理、格式化
 		buttonPanel.add(unicodeDecode);
+		buttonPanel.add(unicodeEncode);
 		buttonPanel.add(unescapeHTML);
 		buttonPanel.add(formateJson);
 	}

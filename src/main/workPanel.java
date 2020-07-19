@@ -17,6 +17,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.LineBorder;
+import java.awt.Font;
 
 public class workPanel extends JPanel{
 
@@ -58,6 +59,7 @@ public class workPanel extends JPanel{
 	public static JTextArea createTextArea() {
 
 		JTextArea newOne = new JTextArea();
+		newOne.setFont(new Font("Monospaced", Font.PLAIN, 16));
 		newOne.setBorder(new LineBorder(new Color(0, 0, 0)));
 		newOne.setRows(15);
 		newOne.setLineWrap(true);
@@ -65,7 +67,7 @@ public class workPanel extends JPanel{
 			@Override
 			public void focusGained(FocusEvent e) {
 				inputTextArea = (JTextArea) e.getComponent();
-				System.out.print(inputTextArea);
+				//System.out.print(inputTextArea);
 			}
 		});
 		textAreaList.add(newOne);

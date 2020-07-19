@@ -477,7 +477,8 @@ public class Commons {
 	
 	public static List<String> getLinesFromTextArea(JTextArea textarea){
 		//user input maybe use "\n" in windows, so the System.lineSeparator() not always works fine!
-		List<String> result = Arrays.asList(textarea.getText().replaceAll(" ","").replaceAll("\r\n", "\n").split("\n"));
+		String[] lines = textarea.getText().replaceAll("\r\n", "\n").split("\n");
+		List<String> result = new ArrayList<String>(Arrays.asList(lines));
 		result.remove("");
 		return result;
 	}
