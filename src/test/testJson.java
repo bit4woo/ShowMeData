@@ -1,11 +1,7 @@
 package test;
 
-import java.io.File;
-
-import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
-import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 
 
@@ -13,7 +9,7 @@ public class testJson {
 	public static void main(String args[]) {
 		orgJson();
 		gson();
-		fastjson();
+		//fastjson();
 		
 		//String json = FileUtils.readFileToString(new File("D:\\user\\01374214\\desktop\\fengdong-system-id.txt"));
 	}
@@ -41,6 +37,7 @@ public class testJson {
 		System.out.println(userObject1);
 	}
 
+	/*
 	public static void fastjson() {
 		User userObject = new User("张三",26,"男"	);
 		String userJson = JSON.toJSONString(userObject);
@@ -51,6 +48,7 @@ public class testJson {
 		User userObject1 = JSON.parseObject(userJson1, User.class);
 		System.out.println(userObject1);
 	}
+	*/
 
 }
 
